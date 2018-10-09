@@ -3,6 +3,14 @@ import random
 from flask import Flask, request
 from pymessenger.bot import Bot
 import os
+from web_scraper import get_restaurant_menu
+
+RESTAURANT_ORDER = {"CAFE_3": 0,
+                    "CLARK_KERR_CAMPUS": 1,
+                    "CROSSROADS": 2,
+                    "FOOTHILL": 3,
+                    }
+
 app = Flask(__name__)
 ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
 VERIFY_TOKEN = os.environ['VERIFY_TOKEN']
@@ -23,16 +31,16 @@ def receive_message():
        for event in output['entry']:
           messaging = event['messaging']
           for message in messaging:
-            if message.get('message'):
-                #Facebook Messenger ID for user so we know where to send response back to
-                recipient_id = message['sender']['id']
-                if message['message'].get('text'):
-                    response_sent_text = get_message()
-                    send_message(recipient_id, response_sent_text)
-                #if user sends us a GIF, photo,video, or any other non-text item
-                if message['message'].get('attachments'):
-                    response_sent_nontext = get_message()
-                    send_message(recipient_id, response_sent_nontext)
+              if message.get('message'):
+                  #Facebook Messenger ID for user so we know where to send response back to
+                    recipient_id = message['sender']['id']
+                    if message['message'].get('text'):
+                        response_sent_text = get_message(message['message'].get('text'))
+                        send_message(recipient_id, response_sent_text)
+                    #if user sends us a GIF, photo,video, or any other non-text item
+                    if message['message'].get('attachments'):
+                        response_sent_nontext = get_message()
+                        send_message(recipient_id, response_sent_nontext)
     return "Message Processed"
 
 
@@ -45,10 +53,24 @@ def verify_fb_token(token_sent):
 
 
 #chooses a random message to send to the user
-def get_message():
-    sample_responses = ["You are stunning!", "We're proud of you.", "Keep on being you!", "We're greatful to know you :)"]
-    # return selected item to the user
-    return random.choice(sample_responses)
+def get_message(command):
+    # Finds and executes the given command, filling in response
+    default_response = "Not sure what you mean. Try *{}*.".format("crossroads lunch")
+    response = None
+    # This is where you start to implement more commands!
+    command_parts = command.split(" ")
+    print(command_parts)
+    # if len(command_parts) == 1:
+    #     restaurant = command_parts[0].upper()
+    #     response = get_day_menu(restaurant)
+    #     print(response)
+    if len(command_parts) == 2:
+        restaurant, meal = command_parts
+        restaurant = command_parts[0].upper()
+        meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
+        if restaurant in RESTAURANT_ORDER:
+            response = get_restaurant_menu(restaurant, meal)
+    return response or default_response
 
 #uses PyMessenger to send response to user
 def send_message(recipient_id, response):
