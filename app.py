@@ -55,28 +55,43 @@ def verify_fb_token(token_sent):
 #chooses a random message to send to the user
 def get_message(command):
     # Finds and executes the given command, filling in response
-    default_response = "Not sure what you mean. Try *{}*.".format("crossroads lunch")
+    default_response = "Not sure what you mean. Try *{}*.".format("help")
     response = None
     # This is where you start to implement more commands!
     command_parts = command.split(" ")
     print(command_parts)
-    # if len(command_parts) == 1:
-    #     restaurant = command_parts[0].upper()
-    #     response = get_day_menu(restaurant)
-    #     print(response)
+    if len(command_parts) == 1:
+        command = command_parts[0].lower()
+        if command == "help":
+            response = """\
+Hello! Welcome to the Cal Dining Bot!
+Ask me about the food being served at any Berkeley Dining hall.
+Here are the available dining halls:
+- Crossroads
+- Clark_Kerr_campus
+- Foothill
+- Cafe_3
+
+Here are the available meals:
+- Breakfast
+- Lunch
+- Dinner
+
+Here's a sample command: *crossroads dinner*\
+"""
     if len(command_parts) == 2:
         restaurant, meal = command_parts
         restaurant = command_parts[0].upper()
         meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
         if restaurant in RESTAURANT_ORDER:
-            response = get_restaurant_menu(restaurant, meal)
+            response = get_restaurant_menu(restaurant, meal) or "Sorry, that meal wasn't available."
     elif len(command_parts) == 3:
         restaurant, meal, entree = command_parts
         restaurant = command_parts[0].upper()
         entree = entree.upper()
         meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
         if restaurant in RESTAURANT_ORDER:
-            response = get_restaurant_entree(restaurant, meal, entree)
+            response = get_restaurant_entree(restaurant, meal, entree) or "Sorry, that entree wasn't available."
     return response or default_response
 
 #uses PyMessenger to send response to user
