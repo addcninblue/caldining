@@ -3,7 +3,7 @@ import random
 from flask import Flask, request
 from pymessenger.bot import Bot
 import os
-from web_scraper import get_restaurant_menu
+from web_scraper import get_restaurant_menu, get_restaurant_entree
 
 RESTAURANT_ORDER = {"CAFE_3": 0,
                     "CLARK_KERR_CAMPUS": 1,
@@ -70,6 +70,13 @@ def get_message(command):
         meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
         if restaurant in RESTAURANT_ORDER:
             response = get_restaurant_menu(restaurant, meal)
+    elif len(command_parts) == 3:
+        restaurant, meal, entree = command_parts
+        restaurant = command_parts[0].upper()
+        entree = entree.upper()
+        meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
+        if restaurant in RESTAURANT_ORDER:
+            response = get_restaurant_entree(restaurant, meal, entree)
     return response or default_response
 
 #uses PyMessenger to send response to user

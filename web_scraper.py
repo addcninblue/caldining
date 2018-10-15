@@ -91,6 +91,15 @@ def get_restaurant_menu(restaurant, meal):
     else:
         return None
 
+def get_restaurant_entree(restaurant, meal, entree):
+    data = get_restaurant_data(restaurant)
+    parsed = parse_restaurant_data(data)
+    meal_data = parsed.get(meal)
+    if meal_data and meal_data.get(entree):
+        return format_data_meal({entree: meal_data.get(entree)})
+    else:
+        return None
+
 def get_day_menu(restaurant):
     data = get_restaurant_data(restaurant)
     parsed = parse_restaurant_data(data)

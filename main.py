@@ -2,7 +2,7 @@ import os
 import time
 import re
 from slackclient import SlackClient
-from web_scraper import get_restaurant_menu
+from web_scraper import get_restaurant_menu, get_restaurant_entree
 
 RESTAURANT_ORDER = {"CAFE_3": 0,
                     "CROSSROADS": 2,
@@ -65,6 +65,13 @@ def handle_command(command, channel):
         meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
         if restaurant in RESTAURANT_ORDER:
             response = get_restaurant_menu(restaurant, meal)
+    elif len(command_parts) == 3:
+        restaurant, meal, entree = command_parts
+        restaurant = command_parts[0].upper()
+        entree = entree.upper()
+        meal = command_parts[1][0].upper() + command_parts[1][1:].lower()
+        if restaurant in RESTAURANT_ORDER:
+            response = get_restaurant_entree(restaurant, meal, entree)
 
     # Sends the response back to the channel
     slack_client.api_call(
